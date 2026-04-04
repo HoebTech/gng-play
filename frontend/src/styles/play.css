@@ -1,3 +1,27 @@
+/* Fallback theme values — applied before useTheme() sets per-host theme.
+   Matches the 'gamenight' theme so the page isn't blank while /play/init loads. */
+:root {
+    --font: 'Lilita One', 'Arial Black', Arial, sans-serif;
+    --bg-gradient: linear-gradient(135deg, #1a1040 0%, #2d1b69 50%, #1a1040 100%);
+    --bg-color: #110b2e;
+    --accent: #facc15;
+    --card-border: #2d1b69;
+    --active-bg: linear-gradient(135deg, #2d1b69 0%, #3b2580 100%);
+    --active-border: #facc15;
+    --text: #ffffff;
+    --text-accent: #facc15;
+    --text-muted: #a78bfa;
+    --success: #2dd4bf;
+    --success-text: #000000;
+    --btn-bg: #facc15;
+    --btn-text: #1a1040;
+    --btn-blue-bg: #2d1b69;
+    --btn-blue-text: #2dd4bf;
+    --score-first-bg: linear-gradient(135deg, #facc15 0%, #fde68a 100%);
+    --score-first-text: #1a1040;
+    --code-border: #2d1b69;
+}
+
 * {
     margin: 0;
     padding: 0;

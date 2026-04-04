@@ -26,6 +26,7 @@ export default function App() {
   const [checkedAnswers, setCheckedAnswers] = useState(new Set())
   const [revealedAnswers, setRevealedAnswers] = useState([])
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [initError, setInitError] = useState(null)
 
   const isTypingRef = useRef(false)
   const saveAnswersRef = useRef(null)
@@ -44,6 +45,9 @@ export default function App() {
         if (r.redirected) {
           window.location.href = r.url
           return null
+        }
+        if (!r.ok) {
+          throw new Error(`HTTP ${r.status}`)
         }
         return r.json()
       })
@@ -72,6 +76,7 @@ export default function App() {
       })
       .catch(err => {
         console.error('[INIT] Failed to fetch play data:', err)
+        setInitError(err?.message || String(err))
         addToast('Failed to load game data. Please refresh.', 'error')
       })
   }, [addToast])
@@ -130,6 +135,52 @@ export default function App() {
       })
       .catch(() => {})
   }, [])
+
+  // Init-error state — render with inline styles so it shows even if CSS failed to load
+  if (initError) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        background: '#1a1040',
+        color: '#ffffff',
+        fontFamily: 'Arial, sans-serif',
+      }}>
+        <div style={{
+          maxWidth: '400px',
+          background: '#2d1b69',
+          border: '2px solid #facc15',
+          borderRadius: '12px',
+          padding: '24px',
+          textAlign: 'center',
+        }}>
+          <h2 style={{ color: '#facc15', marginBottom: '12px' }}>Failed to load</h2>
+          <p style={{ marginBottom: '16px', opacity: 0.9 }}>
+            Couldn't load your game data. Check your connection and try again.
+          </p>
+          <p style={{ fontSize: '0.8em', opacity: 0.7, marginBottom: '16px' }}>{initError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              background: '#facc15',
+              color: '#1a1040',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 24px',
+              fontSize: '1em',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   // Loading state
   if (view === 'loading' || !gameState) {
