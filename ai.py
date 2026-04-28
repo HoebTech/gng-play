@@ -243,6 +243,9 @@ def call_claude_api(client, model, messages, api_kwargs):
     requires streaming to avoid HTTP timeouts. This helper automatically switches
     to streaming in that case, returning the same Message object either way.
     """
+    if model in ANTHROPIC_NO_TEMPERATURE_MODELS and 'temperature' in api_kwargs:
+        api_kwargs = {k: v for k, v in api_kwargs.items() if k != 'temperature'}
+
     use_streaming = (
         'thinking' in api_kwargs
         and api_kwargs.get('max_tokens', 0) > STREAMING_THRESHOLD
@@ -280,10 +283,14 @@ def get_provider_for_model(model_id):
 # ============= OPENAI HELPERS =============
 
 # Reasoning models use reasoning_effort instead of temperature
-OPENAI_REASONING_MODELS = frozenset({'gpt-5.2', 'gpt-5.4'})
+OPENAI_REASONING_MODELS = frozenset({'gpt-5.2', 'gpt-5.4', 'gpt-5.5'})
 
 # Models that only accept their default temperature (no temperature param allowed)
 OPENAI_FIXED_TEMP_MODELS = frozenset({'gpt-5.3-chat-latest'})
+
+# Anthropic models that have deprecated the `temperature` parameter — sending it
+# returns 400 invalid_request_error. Strip temperature from kwargs at call time.
+ANTHROPIC_NO_TEMPERATURE_MODELS = frozenset({'claude-opus-4-7'})
 
 def call_openai_api(client, model, messages, max_tokens=1024):
     """Call OpenAI Chat Completions API. Handles reasoning, fixed-temp, and standard models."""
